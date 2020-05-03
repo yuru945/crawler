@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[1]:
 
 
 import urllib.request as req
@@ -11,13 +11,14 @@ import json
 # 建立 ssl連線
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+
 # 讀取excel檔案並存檔
 import pandas as pd
 
 
 # # Juniper
 
-# In[8]:
+# In[2]:
 
 
 def Juniper():
@@ -27,7 +28,6 @@ def Juniper():
     request_juniper = req.Request(url_juniper, headers = {
         "user-agent": userAgent_juniper
     })
-#     ssl._create_default_https_context = ssl._create_unverified_context
     
     with req.urlopen(request_juniper) as juniper_res:
         webCode_juniper = juniper_res.read().decode("utf-8")
@@ -121,7 +121,7 @@ def Juniper():
 
 # # Paloalto
 
-# In[9]:
+# In[3]:
 
 
 def Paloalto():
@@ -131,7 +131,6 @@ def Paloalto():
     request_pal = req.Request(url_pal, headers = {
         "user-agent" : userAgent_pal
     })
-#     ssl._create_default_https_context = ssl._create_unverified_context
     
     with req.urlopen(request_pal) as res_pal:
         webCode_pal = res_pal.read().decode("utf-8")
@@ -159,7 +158,7 @@ def Paloalto():
 
 # # Cisco
 
-# In[10]:
+# In[4]:
 
 
 def Cisco():
@@ -172,8 +171,6 @@ def Cisco():
                    ['Cisco 5500','https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1130-ag-series/end_of_life_notice_c51-717227.html?dtid=osscdc000283']
                   ]
     userAgent_cisco = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-    
-#     ssl._create_default_https_context = ssl._create_unverified_context
 
     for page in urls_cisco:
         cisco_labels.append(page[0])
@@ -197,30 +194,12 @@ def Cisco():
                 eos = eos.replace(" ", "")
                 cisco_eoss.append(eos)
 
-#     #Cisco 5500
-#     cisco5500_url = "https://www.cisco.com/c/en/us/support/wireless/5500-series-wireless-controllers/tsd-products-support-series-home.html"
-#     request_cisco5500 = req.Request(cisco5500_url,headers = {
-#         "user-agent" : userAgent_cisco
-#     })
-#     with req.urlopen(request_cisco5500) as res_cisco5500:
-#         webCode_cisco5500 = res_cisco5500.read().decode("utf-8")
-#     root_cisco5500 = bs4.BeautifulSoup(webCode_cisco5500, "lxml")
-#     cisco_labels.append("Cisco 5500")
-#     cisco5500_data = root_cisco5500.find_all("dt")
-#     cisco5500_eol = "None"
-#     cisco5500_eos = cisco5500_data[1].text
-#     cisco5500_target = "None Announced"
-#     cisco5500_index = cisco5500_eos.index(cisco5500_target)
-#     cisco5500_eos = cisco5500_eos[cisco5500_index:cisco5500_index+len(cisco5500_target)]
-#     cisco_eols.append(cisco5500_eol)
-#     cisco_eoss.append(cisco5500_eos)
-
     # print(cisco_labels)
     # print(cisco_eols)
     # print(cisco_eoss)
 
 
-# In[11]:
+# In[5]:
 
 
 # 資料儲存
@@ -318,7 +297,7 @@ df_item_list['EoS'] = eos
 df_item_list.to_excel('Report.xlsx', index=False)
 
 
-# In[12]:
+# In[6]:
 
 
 # 整合
@@ -416,10 +395,4 @@ if __name__ == '__main__':
 
     #存檔
     df_item_list.to_excel('Report.xlsx', index=False)
-
-
-# In[ ]:
-
-
-
 
