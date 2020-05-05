@@ -1,14 +1,24 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# 在file.xlsx檔案中新增Company的欄位，將三個不同公司的產品做分類
+# 爬蟲程式將三家公司的網站分別寫成三個不同function
+# 在讀取file.xlsx後，會依產品的公司類別進行不同的網路連線和資料解析
+# 1. 設定爬蟲程式發送網路連線的request headers來模仿正常的使用者，因為有些網站會拒絕爬蟲程式的連線
+# 2. 使用BeautifulSoup套件解析HTML格式的資料，擷取特定標籤中的內容，找到EoL和EoS
+
 # In[1]:
 
 
 import urllib.request as req
+
+# 使用第三方套件BeautifulSoup來解析HTML網頁標籤
 import bs4
+
 import json
 
-# 建立 ssl連線
+# 一般的網站會拒絕爬蟲程式的連線
+# 建立ssl連線
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -23,8 +33,14 @@ import pandas as pd
 
 def Juniper():
     url_juniper = "https://support.juniper.net/support/eol/"
+    
+    # 盡可能讓爬蟲程式去模仿一般使用者瀏覽網頁的樣子
+    # 一般使用者瀏覽網頁時會用瀏覽器發送網路連線到網站的server
+    ## 正常的網路連線會附加以下資訊在request headers
+    ### user-agent:使用的作業系統、瀏覽器
     userAgent_juniper = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
     #"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36"
+    
     request_juniper = req.Request(url_juniper, headers = {
         "user-agent": userAgent_juniper
     })
@@ -197,104 +213,6 @@ def Cisco():
     # print(cisco_labels)
     # print(cisco_eols)
     # print(cisco_eoss)
-
-
-# In[5]:
-
-
-# 資料儲存
-juniper_labels = []
-juniper_eols = []
-juniper_eoss = []
-
-pal_labels = []
-pal_eols = []
-pal_eoss = []
-
-cisco_labels = []
-cisco_eols = []
-cisco_eoss = []
-
-# 爬蟲
-Juniper()
-Paloalto()
-Cisco()
-
-#讀取excel檔案
-df_item_list = pd.read_excel("file.xlsx") 
-df_item_list.columns=['company', 'type'] #更改欄位名稱，方便存取
-
-eos = []
-eol = []
-for row in df_item_list.itertuples():
-    if row.company == 'Cisco':
-        #print("###")
-        #直接搜尋特定型號的EoL、EoS
-        try:
-            temp_index = cisco_labels.index(row.type)
-            #print(row.type)
-            #print(cisco_eols[temp_index])
-            #print(cisco_eoss[temp_index])
-            eos.append(cisco_eoss[temp_index])
-            eol.append(cisco_eols[temp_index])
-        #如果型號名稱有些差異，就比對網路上爬下來的資料跟目標型號的字串是否有部分符合
-        except ValueError:
-            for c_item in cisco_labels:
-                if row.type in c_item:
-                    temp_index = cisco_labels.index(c_item)
-                    #print(c_item)
-                    #print(cisco_eols[temp_index])
-                    #print(cisco_eoss[temp_index])
-                    eos.append(cisco_eoss[temp_index])
-                    eol.append(cisco_eols[temp_index])
-
-    elif row.company == 'Paloalto':
-        #print("###")
-        #直接搜尋特定型號的EoL、EoS
-        try:
-            temp_index = pal_labels.index(row.type)
-            #print(row.type)
-            #print(pal_eols[temp_index])
-            #print(pal_eoss[temp_index])
-            eos.append(pal_eoss[temp_index])
-            eol.append(pal_eols[temp_index])
-        #如果型號名稱有些差異，就比對網路上爬下來的資料跟目標型號的字串是否有部分符合
-        except ValueError:
-            for p_item in pal_labels:
-                if row.type in p_item:
-                    temp_index = pal_labels.index(p_item)
-                    #print(p_item)
-                    #print(pal_eols[temp_index])
-                    #print(pal_eoss[temp_index])
-                    eos.append(pal_eoss[temp_index])
-                    eol.append(pal_eols[temp_index])
-
-    elif row.company == 'Juniper':
-        #print("###")
-        #直接搜尋特定型號的EoL、EoS
-        try:
-            temp_index = juniper_labels.index(row.type)
-            #print(row.type)
-            #print(juniper_eols[temp_index])
-            #print(juniper_eoss[temp_index])
-            eos.append(juniper_eoss[temp_index])
-            eol.append(juniper_eols[temp_index])
-        #如果型號名稱有些差異，就比對網路上爬下來的資料跟目標型號的字串是否有部分符合
-        except ValueError:
-            for j_item in juniper_labels:
-                if row.type in j_item:
-                    #print(j_item)
-                    #print(juniper_eols[temp_index])
-                    #print(juniper_eoss[temp_index])
-                    temp_index = juniper_labels.index(j_item)
-                    eos.append(juniper_eoss[temp_index])
-                    eol.append(juniper_eols[temp_index])
-
-df_item_list['EoL'] = eol
-df_item_list['EoS'] = eos
-
-#存檔
-df_item_list.to_excel('Report.xlsx', index=False)
 
 
 # In[6]:
