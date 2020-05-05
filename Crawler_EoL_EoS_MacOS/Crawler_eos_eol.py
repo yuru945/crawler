@@ -6,6 +6,7 @@
 # 在讀取file.xlsx後，會依產品的公司類別進行不同的網路連線和資料解析
 # 1. 設定爬蟲程式發送網路連線的request headers來模仿正常的使用者，因為有些網站會拒絕爬蟲程式的連線
 # 2. 使用BeautifulSoup套件解析HTML格式的資料，擷取特定標籤中的內容，找到EoL和EoS
+# 將最終結果輸出成Report.xlsx
 
 # In[1]:
 
